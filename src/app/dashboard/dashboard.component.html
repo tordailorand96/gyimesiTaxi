@@ -1,0 +1,183 @@
+<div class="flex justify-center">
+  <div class="flex flex-col justify-center pt-40">
+    <div class="flex justify-between items-center">
+      <div>
+        <input
+          #fileUpload
+          multiple
+          class="form-control text-red-500"
+          type="file"
+          accept=".xml"
+          (change)="uploadFile($event)"
+        />
+      </div>
+      <div>
+        <button
+          class="bg-gray-100 text-gray-600 border-none cursor-pointer hover:text-black hover:bg-green-200 rounded-lg my-2 px-2 mr-2"
+          (click)="saveAsCSV()"
+        >
+          CSV
+        </button>
+        <button
+          class="bg-gray-100 text-gray-600 border-none cursor-pointer hover:text-black hover:bg-green-200 rounded-lg my-2 px-2 mr-2"
+          (click)="printList()"
+        >
+          Print
+        </button>
+        <button
+          class="bg-gray-100 text-gray-600 border-none cursor-pointer hover:text-black hover:bg-red-200 rounded-lg my-2 px-2 mr-2"
+          (click)="resetList()"
+        >
+          Reset
+        </button>
+      </div>
+    </div>
+
+    <div class="w-[1300px] overflow-x-auto relative shadow-md sm:rounded-lg">
+      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <caption
+          class="px-5 py-1 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800"
+        ></caption>
+        <thead
+          class="text-xs text-gray-700 uppercase bg-[#FFBE2E] border-[#FFBE2E] dark:bg-gray-700 dark:text-gray-400"
+        >
+          <tr>
+            <th scope="col" class="py-3 px-6">Nr</th>
+            <th scope="col" class="py-3 px-6">Date</th>
+            <th scope="col" class="py-3 px-6">Day</th>
+            <th scope="col" class="py-3 px-6">Income (ron)</th>
+            <th scope="col" class="py-3 px-6">Nr Routes</th>
+            <th scope="col" class="py-3 px-6">Total distance (km)</th>
+            <th scope="col" class="py-3 px-6">Without customer (km)</th>
+            <th scope="col" class="py-3 px-6">With customer (km)</th>
+            <th scope="col" class="py-3 px-6">WITH CT (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- <tr *ngIf="!avgData" class="w-full">
+            <td class="text-base pl-5 p-2">No items yet. Upload files!</td>
+          </tr> -->
+          <!-- AVERAGE -->
+          <tr
+            class="bg-gray-100 dark:bg-gray-800 dark:border-gray-700 border-b"
+          >
+            <th
+              scope="row"
+              class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              Average
+            </th>
+            <td class="py-4 px-6">
+              {{ dayInfos[0].date | date }} -
+              {{ avgData ? (avgData.date | date) : "-" }}
+            </td>
+            <td class="py-4 px-6">{{ dayInfos.length }} days</td>
+            <td class="py-4 px-6">
+              {{ avgData ? (avgData.avgIncome | number : "1.2-2") : "-" }}
+            </td>
+            <td class="py-4 px-6">
+              {{ avgData ? (avgData.avgRoutes | number : "1.2-2") : "-" }}
+            </td>
+            <td class="py-4 px-6">
+              {{ avgData ? (avgData.avgDistance | number : "1.2-2") : "-" }}
+            </td>
+            <td class="py-4 px-6">
+              {{
+                avgData ? (avgData.avgWithoutCustomer | number : "1.2-2") : "-"
+              }}
+            </td>
+            <td class="py-4 px-6">
+              {{ avgData ? (avgData.avgWithCustomer | number : "1.2-2") : "-" }}
+            </td>
+            <td class="py-4 px-6">
+              {{
+                avgData
+                  ? ((avgData.avgWithCustomer * 100) / avgData.avgDistance
+                    | number : "1.2-2")
+                  : "-"
+              }}
+              %
+            </td>
+          </tr>
+          <!-- SUM -->
+          <tr
+            class="bg-gray-100 dark:bg-gray-800 dark:border-gray-700 border-b"
+          >
+            <th
+              scope="row"
+              class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              SUM
+            </th>
+            <td class="py-4 px-6">
+              {{ dayInfos[0].date | date }} -
+              {{ avgData ? (avgData.date | date) : "-" }}
+            </td>
+            <td class="py-4 px-6">{{ dayInfos.length }} days</td>
+
+            <td class="py-4 px-6">
+              {{ sumData ? (sumData.totalIncome | number : "1.2-2") : "-" }}
+            </td>
+            <td class="py-4 px-6">
+              {{ sumData ? (sumData.totalRoutes | number : "1.2-2") : "-" }}
+            </td>
+            <td class="py-4 px-6">
+              {{ sumData ? (sumData.totalDistance | number : "1.2-2") : "-" }}
+            </td>
+            <td class="py-4 px-6">
+              {{
+                sumData
+                  ? (sumData.totalWithoutCustomer | number : "1.2-2")
+                  : "-"
+              }}
+            </td>
+            <td class="py-4 px-6">
+              {{
+                sumData ? (sumData.totalWithCustomer | number : "1.2-2") : "-"
+              }}
+            </td>
+            <td class="py-4 px-6">
+              {{
+                sumData
+                  ? ((sumData.totalWithCustomer * 100) / sumData.totalDistance
+                    | number : "1.2-2")
+                  : "-"
+              }}
+              %
+            </td>
+          </tr>
+          <tr
+            *ngFor="let dayInfo of dayInfos"
+            class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+          >
+            <th
+              scope="row"
+              class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              {{ dayInfo.codeBon }}
+            </th>
+            <td class="py-4 px-6">{{ dayInfo.date | date }}</td>
+            <td class="py-4 px-6">{{ dayInfo.date | date : "EEEE" }}</td>
+            <td class="py-4 px-6">{{ dayInfo.income }} ron</td>
+            <td class="py-4 px-6">{{ dayInfo.routes }}</td>
+            <td class="py-4 px-6">{{ dayInfo.distance }} km</td>
+            <td class="py-4 px-6">
+              {{ dayInfo.distanceWithoutC | number : "1.2-2" }} km
+            </td>
+            <td class="py-4 px-6">
+              {{ dayInfo.distanceWithC | number : "1.2-2" }}
+              km
+            </td>
+            <td class="py-4 px-6">
+              {{
+                (dayInfo.distanceWithC * 100) / dayInfo.distance
+                  | number : "1.2-2"
+              }}
+              %
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

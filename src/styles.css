@@ -1,0 +1,8 @@
+/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+::-webkit-file-upload-button {
+  @apply bg-gray-100 text-gray-600 border-none cursor-pointer hover:text-black hover:bg-green-200 rounded-lg my-2;
+}
