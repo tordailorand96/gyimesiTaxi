@@ -27,4 +27,5 @@ export interface Day {
   codeBon: string;
   date: Date;
   curse: Cursa[];
+  tva: number;
 }

@@ -33,7 +33,7 @@
       </div>
     </div>
 
-    <div class="w-[1300px] overflow-x-auto relative shadow-md sm:rounded-lg">
+    <div class="w-[1600px] overflow-x-auto relative shadow-md sm:rounded-lg">
       <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <caption
           class="px-5 py-1 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800"
@@ -45,7 +45,8 @@
             <th scope="col" class="py-3 px-6">Nr</th>
             <th scope="col" class="py-3 px-6">Date</th>
             <th scope="col" class="py-3 px-6">Day</th>
-            <th scope="col" class="py-3 px-6">Income (ron)</th>
+            <th scope="col" class="py-3 px-6">Brut Income (ron)</th>
+            <th scope="col" class="py-3 px-6">TVA (ron)</th>
             <th scope="col" class="py-3 px-6">Nr Routes</th>
             <th scope="col" class="py-3 px-6">Total distance (km)</th>
             <th scope="col" class="py-3 px-6">Without customer (km)</th>
@@ -53,12 +54,13 @@
             <th scope="col" class="py-3 px-6">WITH CT (%)</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- <tr *ngIf="!avgData" class="w-full">
-            <td class="text-base pl-5 p-2">No items yet. Upload files!</td>
-          </tr> -->
+        <div *ngIf="dayInfos.length === 0" class="w-full">
+          <p class="text-base pl-5 p-2 w-full">No items yet!</p>
+        </div>
+        <tbody *ngIf="dayInfos.length > 0">
           <!-- AVERAGE -->
           <tr
+            *ngIf="avgData"
             class="bg-gray-100 dark:bg-gray-800 dark:border-gray-700 border-b"
           >
             <th
@@ -69,38 +71,38 @@
             </th>
             <td class="py-4 px-6">
               {{ dayInfos[0].date | date }} -
-              {{ avgData ? (avgData.date | date) : "-" }}
+              {{ avgData.date | date }}
             </td>
             <td class="py-4 px-6">{{ dayInfos.length }} days</td>
             <td class="py-4 px-6">
-              {{ avgData ? (avgData.avgIncome | number : "1.2-2") : "-" }}
+              {{ avgData.avgIncome | number : "1.2-2" }} ron
             </td>
             <td class="py-4 px-6">
-              {{ avgData ? (avgData.avgRoutes | number : "1.2-2") : "-" }}
+              {{ avgData.avgTVA | number : "1.2-2" }} ron
             </td>
             <td class="py-4 px-6">
-              {{ avgData ? (avgData.avgDistance | number : "1.2-2") : "-" }}
+              {{ avgData.avgRoutes | number : "1.2-2" }} routes
+            </td>
+            <td class="py-4 px-6">
+              {{ avgData.avgDistance | number : "1.2-2" }} km
+            </td>
+            <td class="py-4 px-6">
+              {{ avgData.avgWithoutCustomer | number : "1.2-2" }} km
+            </td>
+            <td class="py-4 px-6">
+              {{ avgData.avgWithCustomer | number : "1.2-2" }} km
             </td>
             <td class="py-4 px-6">
               {{
-                avgData ? (avgData.avgWithoutCustomer | number : "1.2-2") : "-"
-              }}
-            </td>
-            <td class="py-4 px-6">
-              {{ avgData ? (avgData.avgWithCustomer | number : "1.2-2") : "-" }}
-            </td>
-            <td class="py-4 px-6">
-              {{
-                avgData
-                  ? ((avgData.avgWithCustomer * 100) / avgData.avgDistance
-                    | number : "1.2-2")
-                  : "-"
+                (avgData.avgWithCustomer * 100) / avgData.avgDistance
+                  | number : "1.2-2"
               }}
               %
             </td>
           </tr>
           <!-- SUM -->
           <tr
+            *ngIf="avgData && sumData"
             class="bg-gray-100 dark:bg-gray-800 dark:border-gray-700 border-b"
           >
             <th
@@ -111,37 +113,32 @@
             </th>
             <td class="py-4 px-6">
               {{ dayInfos[0].date | date }} -
-              {{ avgData ? (avgData.date | date) : "-" }}
+              {{ avgData.date | date }}
             </td>
             <td class="py-4 px-6">{{ dayInfos.length }} days</td>
 
             <td class="py-4 px-6">
-              {{ sumData ? (sumData.totalIncome | number : "1.2-2") : "-" }}
+              {{ sumData.totalIncome | number : "1.2-2" }} ron
             </td>
             <td class="py-4 px-6">
-              {{ sumData ? (sumData.totalRoutes | number : "1.2-2") : "-" }}
+              {{ sumData.totalTVA | number : "1.2-2" }} ron
             </td>
             <td class="py-4 px-6">
-              {{ sumData ? (sumData.totalDistance | number : "1.2-2") : "-" }}
+              {{ sumData.totalRoutes | number : "1.2-2" }} routes
             </td>
             <td class="py-4 px-6">
-              {{
-                sumData
-                  ? (sumData.totalWithoutCustomer | number : "1.2-2")
-                  : "-"
-              }}
+              {{ sumData.totalDistance | number : "1.2-2" }} km
             </td>
             <td class="py-4 px-6">
-              {{
-                sumData ? (sumData.totalWithCustomer | number : "1.2-2") : "-"
-              }}
+              {{ sumData.totalWithoutCustomer | number : "1.2-2" }} km
+            </td>
+            <td class="py-4 px-6">
+              {{ sumData.totalWithCustomer | number : "1.2-2" }} km
             </td>
             <td class="py-4 px-6">
               {{
-                sumData
-                  ? ((sumData.totalWithCustomer * 100) / sumData.totalDistance
-                    | number : "1.2-2")
-                  : "-"
+                (sumData.totalWithCustomer * 100) / sumData.totalDistance
+                  | number : "1.2-2"
               }}
               %
             </td>
@@ -159,6 +156,7 @@
             <td class="py-4 px-6">{{ dayInfo.date | date }}</td>
             <td class="py-4 px-6">{{ dayInfo.date | date : "EEEE" }}</td>
             <td class="py-4 px-6">{{ dayInfo.income }} ron</td>
+            <td class="py-4 px-6">{{ dayInfo.tva }} ron</td>
             <td class="py-4 px-6">{{ dayInfo.routes }}</td>
             <td class="py-4 px-6">{{ dayInfo.distance }} km</td>
             <td class="py-4 px-6">

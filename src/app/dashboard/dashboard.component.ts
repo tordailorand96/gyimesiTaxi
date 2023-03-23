@@ -3,16 +3,9 @@ import { FileService } from '../file.service';
 import { Cursa, Day } from '../models/cursa.model';
 import { NgxXml2jsonService } from 'ngx-xml2json';
 import { AngularCsv } from 'angular-csv-ext/dist/Angular-csv';
-
-export interface ExportData {
-  nrBon: string;
-  date: string;
-  income: number;
-  routes: number;
-  totalDistance: number;
-  withoutC: number;
-  withC: number;
-}
+import { ExportDataModel } from '../models/exportDataModel';
+import { AvgModel } from '../models/avgModel';
+import { SumModel } from '../models/sumModel';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,8 +14,8 @@ export interface ExportData {
 })
 export class DashboardComponent implements OnInit {
   dayInfos: Day[] = [];
-  avgData: any = null;
-  sumData: any = null;
+  avgData!: AvgModel;
+  sumData!: SumModel;
 
   objs: any = {};
 
@@ -50,7 +43,6 @@ export class DashboardComponent implements OnInit {
       const xml = parser.parseFromString(data, 'text/xml');
       const obj = this.ngxXml2jsonService.xmlToJson(xml);
       this.objs = obj;
-      let curse: any = this.objs.msj.bonT;
 
       let curseArray: Cursa[] = [];
 
@@ -77,13 +69,15 @@ export class DashboardComponent implements OnInit {
         distanceWithC: day.ut['@attributes'].totDCU,
         distanceWithoutC:
           day.ut['@attributes'].totDU - day.ut['@attributes'].totDCU,
+        tva: day['@attributes'].totTva,
       };
+
       this.dayInfos.push(dayInfo);
       this.dayInfos.sort((a: any, b: any) => {
         return a.date - b.date;
       });
 
-      if (this.numberOfFiles == this.dayInfos.length) {
+      if (this.numberOfFiles === this.dayInfos.length) {
         this.calculateAverage();
       }
     });
@@ -122,44 +116,53 @@ export class DashboardComponent implements OnInit {
   }
 
   calculateAverage() {
-    let totalIncome: number = 0;
-    let totalRoutes: number = 0;
-    let totalDistance: number = 0;
-    let totalWithCustomer: number = 0;
-    let totalWithoutCustomer: number = 0;
+    if (this.dayInfos.length > 0) {
+      let totalIncome: number = 0;
+      let totalTVA: number = 0;
+      let totalRoutes: number = 0;
+      let totalDistance: number = 0;
+      let totalWithCustomer: number = 0;
+      let totalWithoutCustomer: number = 0;
 
-    this.dayInfos.forEach((el) => {
-      totalDistance += Number(el.distance);
-      totalRoutes += Number(el.routes);
-      totalIncome += Number(el.income);
-      totalWithCustomer += Number(el.distanceWithC);
-      totalWithoutCustomer += Number(el.distanceWithoutC);
-    });
+      this.dayInfos.forEach((el) => {
+        totalDistance += Number(el.distance);
+        totalRoutes += Number(el.routes);
+        totalIncome += Number(el.income);
+        totalTVA += Number(el.tva);
+        totalWithCustomer += Number(el.distanceWithC);
+        totalWithoutCustomer += Number(el.distanceWithoutC);
+      });
 
-    this.avgData = {
-      date: this.dayInfos[this.numberOfFiles - 1].date,
-      avgIncome: totalIncome / this.numberOfFiles,
-      avgRoutes: totalRoutes / this.numberOfFiles,
-      avgDistance: totalDistance / this.numberOfFiles,
-      avgWithCustomer: totalWithCustomer / this.numberOfFiles,
-      avgWithoutCustomer: totalWithoutCustomer / this.numberOfFiles,
-    };
+      this.avgData = {
+        date: this.dayInfos[this.numberOfFiles - 1]
+          ? this.dayInfos[this.numberOfFiles - 1].date
+          : undefined,
+        avgIncome: totalIncome / this.numberOfFiles,
+        avgTVA: totalTVA / this.numberOfFiles,
+        avgRoutes: totalRoutes / this.numberOfFiles,
+        avgDistance: totalDistance / this.numberOfFiles,
+        avgWithCustomer: totalWithCustomer / this.numberOfFiles,
+        avgWithoutCustomer: totalWithoutCustomer / this.numberOfFiles,
+      };
 
-    this.sumData = {
-      date: `${this.dayInfos[0].date.toDateString()}-${this.avgData.date.toDateString()}`,
-      totalIncome: totalIncome,
-      totalRoutes: totalRoutes,
-      totalDistance: totalDistance,
-      totalWithCustomer: totalWithCustomer,
-      totalWithoutCustomer: totalWithoutCustomer,
-    };
+      this.sumData = {
+        date: `${this.dayInfos[0].date.toDateString()}-${this.avgData.date?.toDateString()}`,
+        totalIncome: totalIncome,
+        totalTVA: totalTVA,
+        totalRoutes: totalRoutes,
+        totalDistance: totalDistance,
+        totalWithCustomer: totalWithCustomer,
+        totalWithoutCustomer: totalWithoutCustomer,
+      };
 
-    totalIncome = 0;
-    totalRoutes = 0;
-    totalDistance = 0;
-    totalWithCustomer = 0;
-    totalWithoutCustomer = 0;
-    this.numberOfFiles = 0;
+      totalIncome = 0;
+      totalTVA = 0;
+      totalRoutes = 0;
+      totalDistance = 0;
+      totalWithCustomer = 0;
+      totalWithoutCustomer = 0;
+      this.numberOfFiles = 0;
+    }
   }
 
   printList() {
@@ -173,12 +176,13 @@ export class DashboardComponent implements OnInit {
       decimalseparator: '.',
       showLabels: true,
       showTitle: true,
-      title: ` TEST`,
+      title: ` Gyimesi TAXI`,
       useBom: true,
       headers: [
         'Nr Bon',
         'Data',
         'Income (ron)',
+        'TVA (ron)',
         'Routes',
         'Distance (km)',
         'Without Customer (km)',
@@ -187,22 +191,13 @@ export class DashboardComponent implements OnInit {
       useHeader: false,
       nullToEmptyString: true,
     };
-    let exportData: Array<ExportData> = [];
-
-    // exportData.push({
-    //   nrBon: 'SUM',
-    //   date: `${this.dayInfos[0].date.toDateString()}-${this.avgData.date.toDateString()}`,
-    //   income: Number(Number(this.sumData.totalIncome).toFixed(2)),
-    //   routes: Number(Number(this.sumData.totalRoutes).toFixed(2)),
-    //   totalDistance: Number(Number(this.sumData.totalDistance).toFixed(2)),
-    //   withoutC: Number(Number(this.sumData.totalWithoutCustomer).toFixed(2)),
-    //   withC: Number(Number(this.sumData.totalWithCustomer).toFixed(2)),
-    // });
+    let exportData: Array<ExportDataModel> = [];
 
     exportData.push({
       nrBon: 'AVG',
-      date: `${this.dayInfos[0].date.toDateString()}-${this.avgData.date.toDateString()}`,
+      date: `${this.dayInfos[0].date.toDateString()}-${this.avgData.date?.toDateString()}`,
       income: Number(Number(this.avgData.avgIncome).toFixed(2)),
+      tva: Number(Number(this.avgData.avgTVA).toFixed(2)),
       routes: Number(Number(this.avgData.avgRoutes).toFixed(2)),
       totalDistance: Number(Number(this.avgData.avgDistance).toFixed(2)),
       withoutC: Number(Number(this.avgData.avgWithoutCustomer).toFixed(2)),
@@ -214,6 +209,7 @@ export class DashboardComponent implements OnInit {
         nrBon: dayInfo.codeBon,
         date: dayInfo.date.toDateString(),
         income: Number(Number(dayInfo.income).toFixed(2)),
+        tva: Number(Number(dayInfo.tva)),
         routes: Number(Number(dayInfo.routes).toFixed(2)),
         totalDistance: Number(Number(dayInfo.distance).toFixed(2)),
         withoutC: Number(Number(dayInfo.distanceWithoutC).toFixed(2)),
@@ -233,8 +229,8 @@ export class DashboardComponent implements OnInit {
   resetList() {
     this.dayInfos = [];
     this.numberOfFiles = 0;
-    this.avgData = null;
-    this.sumData = null;
+    this.avgData = {} as AvgModel;
+    this.sumData = {} as SumModel;
     this.file = null;
     window.location.reload();
   }

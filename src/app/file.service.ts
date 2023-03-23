@@ -8,20 +8,9 @@ import { Cursa, Day } from './models/cursa.model';
   providedIn: 'root',
 })
 export class FileService {
-  objs: any = {};
-
-  constructor(
-    private http: HttpClient,
-    private ngxXml2jsonService: NgxXml2jsonService
-  ) {}
+  constructor(private http: HttpClient) {}
 
   getDayInfo(fileName: string) {
     return this.http.get(fileName, { responseType: 'text' });
-  }
-
-  getFileInfo(file: any) {
-    return this.http.get(file, { responseType: 'text' }).subscribe((data) => {
-      console.log('fileDATA:', data);
-    });
   }
 }
