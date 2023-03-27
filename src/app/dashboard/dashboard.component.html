@@ -1,5 +1,5 @@
 <div class="flex justify-center">
-  <div class="flex flex-col justify-center pt-40">
+  <div class="flex flex-col justify-center pt-40 mx-8 w-full max-w-[1600px]">
     <div class="flex justify-between items-center">
       <div>
         <input
@@ -33,7 +33,7 @@
       </div>
     </div>
 
-    <div class="w-[1600px] overflow-x-auto relative shadow-md sm:rounded-lg">
+    <div class="w-full overflow-x-auto relative shadow-md sm:rounded-lg">
       <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <caption
           class="px-5 py-1 text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-gray-800"
@@ -73,31 +73,30 @@
               {{ dayInfos[0].date | date }} -
               {{ avgData.date | date }}
             </td>
-            <td class="py-4 px-6">{{ dayInfos.length }} days</td>
+            <td class="py-4 px-6">{{ dayInfos.length }}</td>
             <td class="py-4 px-6">
-              {{ avgData.avgIncome | number : "1.2-2" }} ron
+              {{ avgData.avgIncome | number : "1.2-2" }}
             </td>
             <td class="py-4 px-6">
-              {{ avgData.avgTVA | number : "1.2-2" }} ron
+              {{ avgData.avgTVA | number : "1.2-2" }}
             </td>
             <td class="py-4 px-6">
-              {{ avgData.avgRoutes | number : "1.2-2" }} routes
+              {{ avgData.avgRoutes | number : "1.2-2" }}
             </td>
             <td class="py-4 px-6">
-              {{ avgData.avgDistance | number : "1.2-2" }} km
+              {{ avgData.avgDistance | number : "1.2-2" }}
             </td>
             <td class="py-4 px-6">
-              {{ avgData.avgWithoutCustomer | number : "1.2-2" }} km
+              {{ avgData.avgWithoutCustomer | number : "1.2-2" }}
             </td>
             <td class="py-4 px-6">
-              {{ avgData.avgWithCustomer | number : "1.2-2" }} km
+              {{ avgData.avgWithCustomer | number : "1.2-2" }}
             </td>
             <td class="py-4 px-6">
               {{
                 (avgData.avgWithCustomer * 100) / avgData.avgDistance
                   | number : "1.2-2"
               }}
-              %
             </td>
           </tr>
           <!-- SUM -->
@@ -115,32 +114,31 @@
               {{ dayInfos[0].date | date }} -
               {{ avgData.date | date }}
             </td>
-            <td class="py-4 px-6">{{ dayInfos.length }} days</td>
+            <td class="py-4 px-6">{{ dayInfos.length }}</td>
 
             <td class="py-4 px-6">
-              {{ sumData.totalIncome | number : "1.2-2" }} ron
+              {{ sumData.totalIncome | number : "1.2-2" }}
             </td>
             <td class="py-4 px-6">
-              {{ sumData.totalTVA | number : "1.2-2" }} ron
+              {{ sumData.totalTVA | number : "1.2-2" }}
             </td>
             <td class="py-4 px-6">
-              {{ sumData.totalRoutes | number : "1.2-2" }} routes
+              {{ sumData.totalRoutes | number : "1.2-2" }}
             </td>
             <td class="py-4 px-6">
-              {{ sumData.totalDistance | number : "1.2-2" }} km
+              {{ sumData.totalDistance | number : "1.2-2" }}
             </td>
             <td class="py-4 px-6">
-              {{ sumData.totalWithoutCustomer | number : "1.2-2" }} km
+              {{ sumData.totalWithoutCustomer | number : "1.2-2" }}
             </td>
             <td class="py-4 px-6">
-              {{ sumData.totalWithCustomer | number : "1.2-2" }} km
+              {{ sumData.totalWithCustomer | number : "1.2-2" }}
             </td>
             <td class="py-4 px-6">
               {{
                 (sumData.totalWithCustomer * 100) / sumData.totalDistance
                   | number : "1.2-2"
               }}
-              %
             </td>
           </tr>
           <tr
@@ -155,23 +153,23 @@
             </th>
             <td class="py-4 px-6">{{ dayInfo.date | date }}</td>
             <td class="py-4 px-6">{{ dayInfo.date | date : "EEEE" }}</td>
-            <td class="py-4 px-6">{{ dayInfo.income }} ron</td>
-            <td class="py-4 px-6">{{ dayInfo.tva }} ron</td>
+            <td class="py-4 px-6">{{ dayInfo.income }}</td>
+            <td class="py-4 px-6">{{ dayInfo.tva }}</td>
             <td class="py-4 px-6">{{ dayInfo.routes }}</td>
-            <td class="py-4 px-6">{{ dayInfo.distance }} km</td>
+            <td class="py-4 px-6">{{ dayInfo.distance }}</td>
             <td class="py-4 px-6">
-              {{ dayInfo.distanceWithoutC | number : "1.2-2" }} km
+              {{ dayInfo.distanceWithoutC | number : "1.2-2" }}
             </td>
             <td class="py-4 px-6">
               {{ dayInfo.distanceWithC | number : "1.2-2" }}
-              km
             </td>
             <td class="py-4 px-6">
               {{
-                (dayInfo.distanceWithC * 100) / dayInfo.distance
-                  | number : "1.2-2"
+                dayInfo.distanceWithC > 0 && dayInfo.distance > 0
+                  ? ((dayInfo.distanceWithC * 100) / dayInfo.distance
+                    | number : "1.2-2")
+                  : "0.00"
               }}
-              %
             </td>
           </tr>
         </tbody>
